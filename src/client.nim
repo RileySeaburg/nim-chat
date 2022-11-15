@@ -1,4 +1,5 @@
 import os
+import threadpool
 echo("Chat application started")
 if paramCount() == 0:
   quit("Please specify the server address, e.g. ./client localhost")
@@ -6,5 +7,9 @@ if paramCount() == 0:
 let serverAddr = paramStr(1)
 echo("Connecting to ", serverAddr)
 while true:
-  let message = readLine(stdin)
-  echo("Sending message: ", message)
+  const message = spawn readLine(stdin)
+  if message == "quit":
+    quit("Bye!")
+  else:
+    spawn send(serverAddr, message)
+  echo("Sending \"", ^message, "\"")
