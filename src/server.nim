@@ -34,7 +34,7 @@ proc processMessages(server: Server, client: Client) {.async.} = # Async procedu
       if c.id != client.id and c.connected:
         await c.socket.send(line & "\c\L")                      # Send message to client
 
-proc loop(server: Server, port = 7687) {.async.} =
+proc loop(server: Server, port = 7688) {.async.} =
   ## Loops forever and checks for new connections.
   # Bind the port number specified by ``port``.
   server.socket.bindAddr(port.Port)                 # Bind to port
@@ -55,8 +55,12 @@ proc loop(server: Server, port = 7687) {.async.} =
     server.clients.add(client)                                      # Add client to list
     asyncCheck processMessages(server, client)                      # Start processing messages
 
-var server = newServer()
-
-waitFor loop(server)                                # Start server
-
-
+# Check whether this module has been imported as a dependency to another
+# module, or whether this module is the main module.
+when isMainModule:
+  # Initialise a new server.
+  var server = newServer()
+  echo("Server initialised!")
+  # Execute the ``loop`` procedure. The ``waitFor`` procedure will run the
+  # asyncdispatch event loop until the ``loop`` procedure finishes executing.
+  waitFor loop(server)

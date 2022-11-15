@@ -8,7 +8,7 @@ proc connect(socket: AsyncSocket, serverAddr: string) {.async.} =
   echo("Connecting to ", serverAddr)
   # Pause the execution of this procedure until the socket connects to
   # the specified server.
-  await socket.connect(serverAddr, 7687.Port)
+  await socket.connect(serverAddr, 7688.Port)
   echo("Connected!")
 
   while true:
@@ -23,12 +23,14 @@ proc connect(socket: AsyncSocket, serverAddr: string) {.async.} =
 
 
 echo("Chat application started")
-if paramCount() == 0:
-  quit("Please specify the server address, e.g. ./client localhost")
+if paramCount() < 2:
+  quit("Please specify the server address, e.g. ./client localhost username")
 
 
 # Retrieve the first command line argument.
 let serverAddr = paramStr(1)
+# Retrieve the second command line argument.
+let username = paramStr(2)
 # Initialise a new asynchronous socket.
 var socket = newAsyncSocket()
 
@@ -38,9 +40,10 @@ var messageFlowVar = spawn stdin.readLine()
 while true:
   if messageFlowVar.isReady():
     # If the user has typed a message, send it to the server.
-    let message = createMessage("Anonymous", ^messageFlowVar)
-    asyncCheck socket.send(message)
+    
+    asyncCheck socket.send(createMessage(username, ^messageFlowVar))
     messageFlowVar = spawn stdin.readLine()
     # Start reading from standard input again.
-    
+  # Execute the asyncdispatch event loop, to continue the execution of
+  # asynchronous procedures.
   asyncdispatch.poll()
