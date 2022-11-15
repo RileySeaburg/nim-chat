@@ -7,9 +7,5 @@ if paramCount() == 0:
 let serverAddr = paramStr(1)
 echo("Connecting to ", serverAddr)
 while true:
-  const message = spawn readLine(stdin)
-  if message == "quit":
-    quit("Bye!")
-  else:
-    spawn send(serverAddr, message)
+  let message = spawn stdin.readLine()
   echo("Sending \"", ^message, "\"")
